@@ -15,6 +15,7 @@ Netflix.prototype.getRatingHistory = util.promisify(Netflix.prototype.getRatingH
 Netflix.prototype.getViewingHistory = util.promisify(Netflix.prototype.getViewingHistory);
 Netflix.prototype.setStarRating = util.promisify(Netflix.prototype.setStarRating);
 Netflix.prototype.setThumbRating = util.promisify(Netflix.prototype.setThumbRating);
+Netflix.prototype.getMyList = util.promisify(Netflix.prototype.getMyList);
 const sleep = util.promisify(setTimeout);
 
 /**
@@ -43,11 +44,13 @@ async function main(args, netflix = new Netflix()) {
 			
 			const ratingHistory = await main.getRatingHistory(netflix);
 			const viewingHistory = await main.getViewingHistory(netflix);
+			const myList = await main.getMyList(netflix);
 			
 			const dataToBeSaved = {
 				version: version,
 				ratingHistory: ratingHistory,
-				viewingHistory: viewingHistory
+				viewingHistory: viewingHistory,
+				myList: myList
 			};
 			
 			main.writeToChosenOutput(dataToBeSaved, filename, args.spaces);
@@ -160,6 +163,25 @@ main.getViewingHistory = async function(netflix) {
 	} catch (e) {
 		console.error(e);
 		throw new Error('Could not retrieve viewing history. For more information, please see previous log satements.')
+	}
+};
+
+/**
+ * Gets my list for current profile
+ * @param {Netflix} netflix
+ * @returns {Promise} Promise that is resolved with viewing history once it has been fetched
+ */
+main.getMyList = async function(netflix) {
+	let myList;
+	
+	try {
+		console.log('Getting profile my list...');
+		myList = await netflix.getMyList();
+		console.log('Finished getting my list');
+		return myList;
+	} catch (e) {
+		console.error(e);
+		throw new Error('Could not retrieve profile my list. For more information, please see previous log satements.')
 	}
 };
 
